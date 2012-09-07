@@ -1,0 +1,88 @@
+#!/bin/sh
+
+## tornado startup script
+## 
+
+TORNADO_HOME=/opt/tornado
+PROG_NAME=main.py
+CMD=$TORNADO_HOME/$PROG_NAME
+LOGFILE=$TORNADO_HOME/logs/all.log
+PORT=$2
+PYTHON=/usr/bin/python
+
+set -e
+
+if [ ! $PORT ];
+then
+    PORT=8888;
+fi
+LOCKFILE=$TORNADO_HOME/var/lock.$PORT
+
+start ()
+{
+    [ -e $LOCKFILE ] && echo "lockfile exists!" && exit -1
+
+    echo -n "Starting $PROG_NAME: "
+
+    # startup tornado
+    $PYTHON $CMD $PORT >> $LOGFILE 2>&1
+    RETVAL=$?
+    PID=`ps aux | grep -e "python $CMD [0-9]*$" | awk '{print $2}'`
+
+    [ $RETVAL = 0 ] && echo -en "\t\t\t[\\033[1;32m OK \\033[0;37m]"
+    sleep 1
+
+    echo
+    [ $RETVAL = 0 ] && touch $LOCKFILE
+    echo -n $PID > $LOCKFILE
+    return $RETVAL
+}
+
+stop () 
+{
+    echo -n "Stopping $PROG_NAME: "
+    PID=`cat $LOCKFILE`
+    kill $PID
+    RETVAL=$?
+
+    [ $RETVAL = 0 ] && echo -en "\t\t\t[\\033[1;32m OK \\033[0;37m]"
+    sleep 1
+
+    echo
+    [ $RETVAL = 0 ] && rm -rf $LOCKFILE
+    return $RETVAL
+}
+
+restart ()
+{
+    stop
+    start
+}
+
+test ()
+{
+    if [ nosetests -e ];
+    then
+        nosetests
+    else
+        $PYTHON setup.py test
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    test)
+        test
+        ;;
+    *)
+    echo "Usage: tornado {start|stop|restart}" ;;
+esac
+

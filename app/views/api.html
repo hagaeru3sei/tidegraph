@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>{{ items['title'] }}</title>
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/redmond/jquery-ui-1.8.22.custom.css">
+
+<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui-1.8.22.custom.min.js"></script>
+
+<script type='text/javascript'><!--//<![CDATA[
+$(function() {
+    $( "#datepicker" ).datepicker({
+        dateFormat: "yymmdd",
+        numberOfMonths: 1,
+        showButtonPanel: true,
+        selectOtherMonths: true
+    });
+});
+//]]>--></script>
+
+</head>
+<body>
+<div id="main">
+
+<div id="header">
+<h1>{{ items['header_title'] }}</h1>
+</div>
+<!-- end of header -->
+
+<div id="content">
+<h3>{{ items['areaname'] }}</h3>
+{% if items['target_date'] %}
+<img src="/images/{{ items['location'] }}.{{ items['target_date'] }}.png">
+{% else %}
+<img src="/images/{{ items['location'] }}.png">
+{% end %}
+
+<div id="mainform">
+<form action="" method="get">
+<select name="area">
+<option value="-">場所を選択して下さい</option>
+{% for i in sorted(items['areas']) %}
+  <optgroup label="{{ escape(items['states'][i]) }}">
+  {% for k, area in items['areas'][i].iteritems() %}
+    {% if items['location'] == area['location'] %}
+    <option value="{{ escape(str(k)) }}" selected="selected">{{ escape(area['areaname']) }}</option>
+    {% else %}
+    <option value="{{ escape(str(k)) }}">{{ escape(area['areaname']) }}</option>
+    {% end %}
+  {% end %}
+  </optgroup>
+{% end %}
+</select>
+日付:<input type="text" id="datepicker" name="date" value="{% if items['target_date'] %}{{ items['target_date'] }}{% end %}">
+<input type="submit" name="" value="submit">
+</form>
+</div>
+<!-- end of mainform -->
+
+</div>
+<!-- end of content -->
+
+<div id="sub">
+<h4>潮位グラフ</h4>
+<p>このグラフは海上保安庁及び気象庁の提供するデータを元にしています。</p>
+<p>青線が指定日または本日、緑線が青線の前日のデータになります。本日以前の青線、緑線は実データに基づいたもの。未来日付の青線は予測値となっています。</p>
+</div>
+<!-- end of sub -->
+
+<div id="footer">
+<span>Copyright &copy; Mochizuki Nobuaki, hagaeru3sei All Rights Reserved.</span>
+</div>
+<!-- end of footer -->
+
+</div>
+<!-- end of main -->
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33924225-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- analytics tracking code -->
+
+</body>
+</html>
